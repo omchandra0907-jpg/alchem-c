@@ -1,0 +1,8 @@
+# Binaries
+alchem-c
+test_runner
+*.o
+src/*.o
+
+# OS artifacts
+.DS_Store
