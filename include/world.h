@@ -73,3 +73,5 @@ bool world_react(world_t *world, int x1, int y1, int x2, int y2);
 const char *element_name(uint8_t type);
 
 #endif /* ALCHEM_WORLD_H */
+
+/* Cache-aligned 1D linear buffer mapping */
