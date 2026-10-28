@@ -228,3 +228,5 @@ void render_frame(render_context_t *rc, world_t *world, uint8_t active_element, 
 }
 
 /* ANSI 24-bit TrueColor mapping table */
+
+/* Single write(STDOUT_FILENO, frame_buf, len) syscall */
