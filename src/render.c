@@ -226,3 +226,5 @@ void render_frame(render_context_t *rc, world_t *world, uint8_t active_element, 
         write(STDOUT_FILENO, rc->frame_buf, rc->buf_len);
     }
 }
+
+/* ANSI 24-bit TrueColor mapping table */
