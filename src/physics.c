@@ -553,3 +553,5 @@ void world_step(world_t *world) {
 /* Stone barrier placement */
 
 /* Clock bit flip guard: cell->clock ^= 1 */
+
+/* Reaction: LAVA + WATER -> STONE + STEAM */
