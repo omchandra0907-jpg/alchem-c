@@ -561,3 +561,5 @@ void world_step(world_t *world) {
 /* Acid corrosion reaction matrix */
 
 /* Gunpowder explosive volatility */
+
+/* Radial blast wave propagation */
