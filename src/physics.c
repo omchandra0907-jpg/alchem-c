@@ -559,3 +559,5 @@ void world_step(world_t *world) {
 /* Steam buoyant upward rise */
 
 /* Acid corrosion reaction matrix */
+
+/* Gunpowder explosive volatility */
