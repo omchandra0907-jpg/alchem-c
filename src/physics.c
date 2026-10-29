@@ -557,3 +557,5 @@ void world_step(world_t *world) {
 /* Reaction: LAVA + WATER -> STONE + STEAM */
 
 /* Steam buoyant upward rise */
+
+/* Acid corrosion reaction matrix */
