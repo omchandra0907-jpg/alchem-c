@@ -38,3 +38,5 @@ run: release
 
 clean:
 	rm -f src/*.o $(TARGET) $(TEST_TARGET)
+
+# Debug target with -fsanitize=address,undefined
