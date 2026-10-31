@@ -543,23 +543,3 @@ void world_step(world_t *world) {
         }
     }
 }
-
-/* Water liquid lateral dispersion logic */
-
-/* Prevent out-of-bounds access at y >= height - 1 */
-
-/* Alternating horizontal scan direction */
-
-/* Stone barrier placement */
-
-/* Clock bit flip guard: cell->clock ^= 1 */
-
-/* Reaction: LAVA + WATER -> STONE + STEAM */
-
-/* Steam buoyant upward rise */
-
-/* Acid corrosion reaction matrix */
-
-/* Gunpowder explosive volatility */
-
-/* Radial blast wave propagation */

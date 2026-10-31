@@ -131,5 +131,3 @@ int main(void) {
     printf("ALL ALCHEM-C TESTS PASSED SUCCESSFULLY!\n");
     return 0;
 }
-
-/* Density displacement test case verified */

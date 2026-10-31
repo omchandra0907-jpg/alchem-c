@@ -73,7 +73,3 @@ bool world_react(world_t *world, int x1, int y1, int x2, int y2);
 const char *element_name(uint8_t type);
 
 #endif /* ALCHEM_WORLD_H */
-
-/* Cache-aligned 1D linear buffer mapping */
-
-#define GRID_IN_BOUNDS(x, y, w, h) ((x) >= 0 && (x) < (w) && (y) >= 0 && (y) < (h))

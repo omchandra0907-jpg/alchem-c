@@ -102,5 +102,3 @@ bool input_poll(input_event_t *ev) {
 
     return false;
 }
-
-/* Keyboard hotkeys: 1-8 brush, Space pause, C clear */
