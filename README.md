@@ -8,13 +8,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![C99](https://img.shields.io/badge/C-C99-blue.svg)](https://en.wikipedia.org/wiki/C99)
 
-> **🌐 Live Interactive Web Demo:** [https://omchandra0907-jpg.github.io/alchem-c/](https://omchandra0907-jpg.github.io/alchem-c/)
-
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Online_Falling-Sand_Lab-00E5FF?style=for-the-badge&labelColor=0d1117)](https://omchandra0907-jpg.github.io/alchem-c/)
+> **Live Interactive Web Demo:** [https://omchandra0907-jpg.github.io/alchem-c/](https://omchandra0907-jpg.github.io/alchem-c/)
 
 ---
 
-## Highlights
+## Architectural Highlights
 
 - **Cache-Friendly 1D Grid Memory**: The entire simulation grid is laid out in a single contiguous `cell_t *cells` array (`width * height`) rather than fragmented pointer arrays (`cell_t **`), providing peak spatial cache locality and single-syscall cleanup.
 - **Bit-Packed 4-Byte Cell Struct**:
@@ -27,91 +25,77 @@
   } cell_t;
   ```
 - **Unbiased Symmetrical Physics**: Bottom-to-top evaluation (`height - 1` down to 0) with alternating horizontal scan directions (`x` sweep oscillates left-to-right and right-to-left based on `(y + clock) % 2`), eliminating directional drift in sand mounds and fluid dispersal.
-- **Single-Syscall Flicker-Free Rendering**: Packs two vertical cells into each terminal character using the Unicode upper half-block (`▀` / `\u2580`) with 24-bit TrueColor ANSI escape sequences. The entire viewport is composed inside a pre-allocated memory buffer and flushed with a single `write(STDOUT_FILENO, ...)` syscall per tick.
-- **Zero-Setup Quick Run**: Bundles a ready-to-run interactive showcase in `samples/run_demo.sh` that launches offline in under 3 seconds.
+- **Single-Syscall Flicker-Free ANSI TrueColor Rendering**: Packs two vertical cells per terminal character using the Unicode upper half-block (`▀`) with 24-bit ANSI background and foreground escape codes. The entire frame buffer is composed in memory and flushed via one atomic `write(STDOUT_FILENO, ...)` syscall per tick.
+- **Interactive Mouse & Keyboard Input**: Supports terminal SGR 1006 mouse drag painting (`\033[?1006h`) and hotkeys for element selection, pause/resume, and canvas reset.
 
 ---
 
 ## Chemical Reaction Matrix
 
-| Reactant A | Reactant B | Resulting Products | Behavior |
+| Reactant A | Reactant B | Resulting Product | Mechanism |
 |---|---|---|---|
-| **LAVA** | **WATER** | `STONE` + `STEAM` | Instant cooling, vaporizing water into rising steam |
-| **FIRE** | **GUNPOWDER** | `FIRE` (Radial Blast) | Detonation shockwave igniting adjacent combustibles |
-| **LAVA** | **GUNPOWDER** | `FIRE` (Detonation) | Thermal ignition creating chain reaction |
-| **ACID** | `STONE` / `SAND` | `STEAM` / Dissolved | Exothermic corrosion consuming the solid over successive ticks |
-| **FIRE** | **WATER** | `STEAM` | Extinguishes flame, producing dense steam clouds |
+| **LAVA** | **WATER** | **STONE + STEAM** | Rapid thermal exchange; water boils into steam, lava vitrifies into stone. |
+| **FIRE** | **GUNPOWDER** | **FIRE (Radial Shockwave)** | High-volatility combustion triggers a radial explosion clearing surrounding cells. |
+| **ACID** | **SAND / STONE / GUNPOWDER** | **EMPTY (Dissolved)** | Corrosive breakdown decrements particle life until substrate is eradicated. |
+| **WATER** | **SAND** | **SAND (Displaced)** | Density differentiation: heavy sand sinks through water columns. |
+| **FIRE** | **WATER** | **STEAM** | Immediate phase transition into buoyant vapor. |
 
 ---
 
-## Interactive Controls
+## Quickstart
 
-| Key / Input | Action |
-|---|---|
-| **Mouse Drag** | Paint active element directly on the canvas (SGR mouse tracking) |
-| **`1` - `8`** | Select element: `[1] Sand` `[2] Water` `[3] Lava` `[4] Acid` `[5] Gunpowder` `[6] Fire` `[7] Stone` `[8] Eraser` |
-| **`+` / `-`** | Increase / Decrease brush radius (1 to 8) |
-| **`Space`** | Pause / Resume physics simulation |
-| **`S` / `N`** | Advance single simulation step while paused |
-| **`C`** | Clear world grid |
-| **`Q`** | Clean exit with terminal mode restoration |
-
----
-
-## Quickstart & Build Targets
-
-### Requirements
-- GCC or Clang
+### Build Requirements
+- GCC or Clang (C99 standard support)
 - GNU Make
-- Any modern terminal with TrueColor and UTF-8 support (Kitty, Ghostty, Alacritty, WezTerm, iTerm2, etc.)
+- POSIX-compliant terminal with 24-bit TrueColor and UTF-8 support
 
-### Build Release (-O2)
+### Build & Run
 ```bash
-make release
+git clone https://github.com/omchandra0907-jpg/alchem-c.git
+cd alchem-c
+
+# Build release binary (-O2)
+make
+
+# Run the simulation
 ./alchem-c
 ```
 
-### Build Debug (AddressSanitizer + UndefinedBehaviorSanitizer)
-```bash
-make debug
-./alchem-c
-```
+### Controls & Keybindings
 
-### Run Automated Headless Verification Suite
+| Key / Mouse Action | Function |
+|---|---|
+| **Left Click + Drag** | Paint with currently selected element |
+| **Right Click + Drag** | Erase particles (Air / Empty) |
+| **Keys `1` – `8`** | Select brush: `1` Sand, `2` Water, `3` Lava, `4` Acid, `5` Gunpowder, `6` Fire, `7` Stone, `8` Steam |
+| **Space** | Pause / resume physics simulation |
+| **Key `c`** | Clear entire simulation grid |
+| **Key `q` / ESC** | Exit cleanly and restore terminal modes |
+
+---
+
+## Verification & Sanity Checks
+
+Build and execute the headless verification suite with AddressSanitizer and UndefinedBehaviorSanitizer enabled:
+
 ```bash
 make test
 ```
 
-### Zero-Setup Demo Showcase
-```bash
-./samples/run_demo.sh
-```
-
 ---
 
-## Architecture & Source Layout
+## Technical Specifications
 
-```
-alchem-c/
-├── Makefile              # Builds release (-O2) and ASan/UBSan debug binaries
-├── include/
-│   ├── world.h           # cell_t struct, element IDs & grid API
-│   └── terminal.h        # termios raw mode, mouse tracking & ANSI buffer
-├── src/
-│   ├── main.c            # Fixed-timestep loop (60 FPS via clock_gettime)
-│   ├── physics.c         # Cellular automata rules & chemical reaction table
-│   ├── input.c           # SGR mouse drag painting (\033[?1006h) & hotkeys
-│   └── render.c          # Half-block frame compositor & HUD status bar
-├── tests/
-│   └── test_reactions.c  # Headless assertions verifying reaction rules
-├── samples/
-│   └── run_demo.sh       # Zero-setup showcase runner
-└── assets/
-    └── demo.gif          # High-framerate visual demonstration
-```
+| Parameter | Specification |
+|---|---|
+| **Language** | ISO C99 (`-std=c99 -pedantic`) |
+| **Cell Size** | Exactly 4 bytes (`sizeof(cell_t) == 4`) |
+| **Frame Rate** | Locked 60 FPS via `clock_gettime(CLOCK_MONOTONIC)` |
+| **Memory Footprint** | ~76.8 KB grid buffer for standard 160x120 terminal resolution |
+| **Sanitizers** | Compiles clean under `-fsanitize=address,undefined` |
 
 ---
 
 ## License
 
-Distributed under the MIT License. Built with passion by [omchandra0907-jpg](https://github.com/omchandra0907-jpg).
+Distributed under the MIT License. Developed by [Om Chandra](https://github.com/omchandra0907-jpg).
